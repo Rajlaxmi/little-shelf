@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Shelf — Book Picks for Kids &amp; Parents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Karla:wght@400;500;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #f3efe3;
+    --card: #fbf8f1;
+    --ink: #22303f;
+    --ink-soft: #566473;
+    --kraft: #c9a66b;
+    --kraft-dark: #a9834a;
+    --mustard: #d9a02b;
+    --teal: #2f6e6e;
+    --stamp: #c1443a;
+    --rule: rgba(34,48,63,0.14);
+    --radius: 3px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(34,48,63,0.025) 0px, rgba(34,48,63,0.025) 1px, transparent 1px, transparent 28px);
+    color: var(--ink);
+    font-family: 'Karla', sans-serif;
+    line-height: 1.5;
+  }
+
+  a { color: inherit; }
+
+  .wrap{
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ---------- Header ---------- */
+  header.site{
+    padding: 56px 20px 28px;
+    text-align: center;
+  }
+
+  .kicker{
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--kraft-dark);
+    margin: 0 0 14px;
+  }
+
+  .kicker::before, .kicker::after{
+    content: "·";
+    margin: 0 10px;
+  }
+
+  h1.title{
+    font-family: 'Zilla Slab', serif;
+    font-weight: 700;
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle{
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0 auto;
+  }
+
+  /* ---------- Tabs (card-catalog drawer look) ---------- */
+  .tabs{
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 40px 0 0;
+    padding: 0 20px;
+  }
+
+  .tab{
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--kraft);
+    color: #fffaf0;
+    border: none;
+    padding: 14px 26px 12px;
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    position: relative;
+    top: 4px;
+    transition: top 0.15s ease, background 0.15s ease;
+  }
+
+  .tab:hover{ top: 0px; }
+
+  .tab:focus-visible{
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .tab[aria-selected="true"]{
+    background: var(--card);
+    color: var(--ink);
+    top: 0;
+    box-shadow: 0 -2px 0 0 var(--kraft-dark) inset;
+  }
+
+  .tab[data-tab="kids"][aria-selected="true"]{ box-shadow: 0 -3px 0 0 var(--mustard) inset; }
+  .tab[data-tab="parents"][aria-selected="true"]{ box-shadow: 0 -3px 0 0 var(--teal) inset; }
+
+  /* ---------- Tag filter ---------- */
+  .filters{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 22px 0 0;
+  }
+
+  .filters-label{
+    font-family: 'Courier Prime', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .filter-chip{
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .filter-chip:hover{
+    border-color: var(--kraft-dark);
+    color: var(--ink);
+  }
+
+  .filter-chip:focus-visible{
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .filter-chip[aria-pressed="true"]{
+    background: var(--stamp);
+    border-color: var(--stamp);
+    color: #fffaf0;
+  }
+
+  .book-card.is-hidden{
+    display: none;
+  }
+
+  .drawer{
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 44px clamp(20px, 5vw, 48px) 20px;
+    box-shadow: 0 18px 40px -28px rgba(34,48,63,0.5);
+  }
+
+  /* ---------- Sections / shelves ---------- */
+  .panel[hidden]{ display: none; }
+
+  .shelf-intro{
+    text-align: center;
+    color: var(--ink-soft);
+    max-width: 52ch;
+    margin: 0 auto 40px;
+    font-size: 0.98rem;
+  }
+
+  section.age-section{
+    margin-bottom: 28px;
+  }
+
+  .section-head{
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+
+  .section-head h2{
+    font-family: 'Zilla Slab', serif;
+    font-size: 1.3rem;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .section-head .note{
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .section-rule{
+    height: 1px;
+    background: linear-gradient(90deg, var(--kraft-dark), transparent 85%);
+    margin: 6px 0 14px;
+  }
+
+  .age-section.emphasis .section-head h2{
+    color: var(--stamp);
+  }
+  .age-section.emphasis .section-rule{
+    background: linear-gradient(90deg, var(--stamp), transparent 85%);
+    height: 2px;
+  }
+
+  /* ---------- Book grid & card ---------- */
+  .book-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .book-card{
+    background: #fffdf8;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 12px 13px 12px;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .book-card::before{
+    content: "";
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 4px;
+    background: var(--spine, var(--kraft));
+    border-radius: 0 2px 2px 0;
+  }
+
+  .book-card:hover{
+    transform: translateY(-3px) rotate(-0.4deg);
+    box-shadow: 0 12px 22px -14px rgba(34,48,63,0.45);
+  }
+
+  .book-card.has-cover{
+    padding-left: 76px;
+    min-height: 96px;
+  }
+
+  .book-card img.cover{
+    position: absolute;
+    left: 13px;
+    top: 12px;
+    width: 46px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 3px 8px -4px rgba(34,48,63,0.55);
+    background: #fff;
+  }
+
+  .call-no{
+    font-family: 'Courier Prime', monospace;
+    font-size: 9px;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+    margin: 0 0 5px;
+  }
+
+  .book-title{
+    font-family: 'Zilla Slab', serif;
+    font-weight: 700;
+    font-size: 1.08rem;
+    margin: 0 0 3px;
+    line-height: 1.18;
+  }
+
+  .book-title a{
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--kraft-dark);
+  }
+
+  .book-title a:hover{
+    border-bottom-style: solid;
+    color: var(--stamp);
+  }
+
+  .book-title a:focus-visible{
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .book-title a::after{
+    content: " ↗";
+    font-size: 0.7em;
+    opacity: 0.5;
+  }
+
+  .book-author{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0 0 7px;
+  }
+
+  .book-blurb{
+    font-size: 0.92rem;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .stamp-badge{
+    position: absolute;
+    top: 8px; right: 8px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--stamp);
+    border: 1.5px solid var(--stamp);
+    border-radius: 50%;
+    width: 30px; height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.05;
+    transform: rotate(8deg);
+    opacity: 0.85;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    text-align: center;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 40px;
+  }
+
+  @media (max-width: 520px){
+    .tabs{ gap: 3px; }
+    .tab{ padding: 12px 16px 10px; font-size: 12px; }
+    .section-head{ flex-wrap: wrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <p class="kicker">est. this year</p>
+  <h1 class="title">Little Shelf</h1>
+  <p class="subtitle">Book picks for kids, sorted by age — and a shelf for the grown-ups raising them.</p>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs" role="tablist" aria-label="Book categories">
+    <button class="tab" data-tab="kids" role="tab" id="tab-kids" aria-controls="panel-kids" aria-selected="true">Kids' Shelf</button>
+    <button class="tab" data-tab="parents" role="tab" id="tab-parents" aria-controls="panel-parents" aria-selected="false" tabindex="-1">Parents' Shelf</button>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filter books by tag">
+    <span class="filters-label">Filter</span>
+    <button class="filter-chip" data-filter="all" aria-pressed="true">All</button>
+    <button class="filter-chip" data-filter="2025" aria-pressed="false">2025</button>
+  </div>
+
+  <div class="drawer">
+
+    <!-- KIDS PANEL -->
+    <div class="panel" id="panel-kids" role="tabpanel" aria-labelledby="tab-kids">
+      <p class="shelf-intro">The actual shelf — everything we've bought her, sorted by where it landed.</p>
+
+      <section class="age-section emphasis">
+        <div class="section-head">
+          <h2>Age 4</h2>
+          <span class="note">this year's shelf — Bob Books phonics set</span>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#d9a02b">
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/279492-L.jpg" alt="Cover of Bob Books — Set 1: Beginning Readers" loading="lazy">
+            <p class="call-no">PB · 04.1</p>
+            <span class="stamp-badge">AGE<br>4+</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Bob%20Books%20Set%201%3A%20Beginning%20Readers%20Bobby%20Lynn%20Maslen" target="_blank" rel="noopener noreferrer">Bob Books — Set 1: Beginning Readers</a></h3>
+            <p class="book-author">Bobby Lynn Maslen</p>
+            <p class="book-blurb">Three-letter words, one sound at a time — teaches the blending skill that turns letters into words a child can sound out alone.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/275943-L.jpg" alt="Cover of Bob Books — Advancing Beginners: Set 2" loading="lazy">
+            <p class="call-no">PB · 04.2</p>
+            <span class="stamp-badge">AGE<br>4+</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Bob%20Books%20Advancing%20Beginners%3A%20Set%202%20Bobby%20Lynn%20Maslen" target="_blank" rel="noopener noreferrer">Bob Books — Advancing Beginners: Set 2</a></h3>
+            <p class="book-author">Bobby Lynn Maslen</p>
+            <p class="book-blurb">Slightly longer decodable stories that stretch Set 1's sounds into full sentences — builds the stamina to keep reading past the first page.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/279495-L.jpg" alt="Cover of Bob Books — Word Families: Set 3" loading="lazy">
+            <p class="call-no">PB · 04.3</p>
+            <span class="stamp-badge">AGE<br>4+</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Bob%20Books%20Word%20Families%3A%20Set%203%20Bobby%20Lynn%20Maslen" target="_blank" rel="noopener noreferrer">Bob Books — Word Families: Set 3</a></h3>
+            <p class="book-author">Bobby Lynn Maslen</p>
+            <p class="book-blurb">Groups words by rhyming family — cat, hat, mat — teaching a reader to spot patterns instead of sounding out every word from scratch.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Picture Books</h2>
+          <span class="note">read-aloud favorites</span>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#8fa998">
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/433694-L.jpg" alt="Cover of We're Going on a Bear Hunt" loading="lazy">
+            <p class="call-no">PB · RA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=We%27re%20Going%20on%20a%20Bear%20Hunt%20Michael%20Rosen" target="_blank" rel="noopener noreferrer">We're Going on a Bear Hunt</a></h3>
+            <p class="book-author">Michael Rosen</p>
+            <p class="book-blurb">A family wades through grass, mud, and a swirling snowstorm to track down a bear — the repeating refrain builds memory and prediction, and "can't go over it, got to go through it" teaches persistence.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/5375131-L.jpg" alt="Cover of Each Peach Pear Plum" loading="lazy">
+            <p class="call-no">PB · RA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Each%20Peach%20Pear%20Plum%20Janet%20%26%20Allan%20Ahlberg" target="_blank" rel="noopener noreferrer">Each Peach Pear Plum</a></h3>
+            <p class="book-author">Janet &amp; Allan Ahlberg</p>
+            <p class="book-blurb">A rhyming "I spy" hunt through nursery-rhyme characters tucked into every picture — sharpens visual search and builds familiarity with classic rhymes.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/8561698-L.jpg" alt="Cover of The Gruffalo" loading="lazy">
+            <p class="call-no">PB · RA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=The%20Gruffalo%20Julia%20Donaldson" target="_blank" rel="noopener noreferrer">The Gruffalo</a></h3>
+            <p class="book-author">Julia Donaldson</p>
+            <p class="book-blurb">A clever mouse invents a monster to scare off predators, then meets the real thing — teaches that quick thinking beats brute strength, with rhyme and repetition that build vocabulary and prediction.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/575575-L.jpg" alt="Cover of The Gruffalo's Child" loading="lazy">
+            <p class="call-no">PB · RA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=The%20Gruffalo%27s%20Child%20Julia%20Donaldson" target="_blank" rel="noopener noreferrer">The Gruffalo's Child</a></h3>
+            <p class="book-author">Julia Donaldson</p>
+            <p class="book-blurb">The Gruffalo's daughter sneaks into the deep dark wood to meet the mouse from her father's stories — reinforces the original's rhyme scheme, plus a gentle lesson about curiosity, warnings, and thinking fast when caught out.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/12163121-L.jpg" alt="Cover of Oi Frog!" loading="lazy">
+            <p class="call-no">PB · RA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Oi%20Frog%21%20Kes%20Gray" target="_blank" rel="noopener noreferrer">Oi Frog!</a></h3>
+            <p class="book-author">Kes Gray</p>
+            <p class="book-blurb">Cat lays down the law on where every animal must sit — mules on stools, hares on chairs — a rhyming-pair game that builds phonemic awareness through silly, sticky vocabulary.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Ages 5–6</h2>
+          <span class="note">phonics &amp; activity workbooks</span>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#8fa998">
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">JF · 05</p>
+            <span class="stamp-badge">AGE<br>5–6</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=My%20Book%20of%20Reading%20Skills%3A%20Phonics%2C%20Vol.%20II%20School%20Zone" target="_blank" rel="noopener noreferrer">My Book of Reading Skills: Phonics, Vol. II</a></h3>
+            <p class="book-author">School Zone</p>
+            <p class="book-blurb">Letter-sound drills and short-word practice — direct repetition that builds the sound-to-symbol link independent reading depends on.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">JF · 05</p>
+            <span class="stamp-badge">AGE<br>4–6</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=My%20Book%20of%20Alphabet%20Games%20School%20Zone" target="_blank" rel="noopener noreferrer">My Book of Alphabet Games</a></h3>
+            <p class="book-author">School Zone</p>
+            <p class="book-blurb">Puzzles, mazes, and matching games built around the alphabet — teaches letter recognition and sequencing through play instead of drilling.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">JF · 05</p>
+            <span class="stamp-badge">AGE<br>5–6</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Amazing%20Mazes%20School%20Zone" target="_blank" rel="noopener noreferrer">Amazing Mazes</a></h3>
+            <p class="book-author">School Zone</p>
+            <p class="book-blurb">A workbook of mazes — builds the pencil control, focus, and forward-planning that both early writing and problem-solving depend on.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">JF · 05</p>
+            <span class="stamp-badge">AGE<br>5–6</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Human%20Body%20Minipedia%20DK" target="_blank" rel="noopener noreferrer">Human Body Minipedia</a></h3>
+            <p class="book-author">DK</p>
+            <p class="book-blurb">A pocket-sized tour of bones, organs, and senses — introduces early science vocabulary and answers the "how does my body work" questions curious kids ask.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Grade 1</h2>
+          <span class="note">first-grade workbooks</span>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#5c7d9a">
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Reading%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Reading</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Short passages and comprehension questions — moves a reader from decoding words to understanding what they actually mean.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Writing%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Writing</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Handwriting and sentence practice, one small step at a time — builds the fine motor control and sentence structure needed to put thoughts on paper.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Geometry%20%26%20Measurement%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Geometry &amp; Measurement</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Shapes, size, and measurement worked step by step — builds spatial reasoning and the everyday math of comparing and measuring.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Word%20Problems%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Word Problems</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Simple word problems that turn arithmetic into everyday scenarios — teaches how to translate a sentence into a math operation, not just recite facts.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Addition%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Addition</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Addition facts drilled in Kumon's gradual, one-skill-at-a-time worksheets — builds fact fluency through repetition until it's automatic.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kumon%20Grade%201%20Subtraction%20Kumon" target="_blank" rel="noopener noreferrer">Kumon Grade 1 Subtraction</a></h3>
+            <p class="book-author">Kumon</p>
+            <p class="book-blurb">Subtraction facts drilled the same gradual way — reinforces addition's inverse until it's automatic, not counted on fingers.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">WB · G1</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Perfect%20Genius%20Logical%20Reasoning%20Activity%20Workbook%20Perfect%20Genius" target="_blank" rel="noopener noreferrer">Perfect Genius Logical Reasoning Activity Workbook</a></h3>
+            <p class="book-author">Perfect Genius</p>
+            <p class="book-blurb">Pattern, sequence, and logic puzzles for Class 1–2 and olympiad prep — builds the reasoning skills that sit underneath both math and reading comprehension.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Ages 9–12</h2>
+          <span class="note">for the big-kid shelf</span>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#8fa998">
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/9354751-L.jpg" alt="Cover of Kid Scientists" loading="lazy">
+            <p class="call-no">JF · 09</p>
+            <span class="stamp-badge">AGE<br>9–12</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kid%20Scientists%3A%20True%20Tales%20of%20Childhood%20from%20Science%20Superstars%20David%20Stabler" target="_blank" rel="noopener noreferrer">Kid Scientists: True Tales of Childhood from Science Superstars</a></h3>
+            <p class="book-author">David Stabler</p>
+            <p class="book-blurb">Ten true stories of the odd, curious childhoods behind science's biggest names — shows that curiosity and getting things wrong, not just talent, are what scientists are made of.</p>
+          </article>
+          <article class="book-card" data-tags="2025">
+            <p class="call-no">JF · 09</p>
+            <span class="stamp-badge">AGE<br>9–12</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Kid%20Innovators%3A%20True%20Tales%20of%20Childhood%20from%20Inventors%20and%20Trailblazers%20David%20Stabler" target="_blank" rel="noopener noreferrer">Kid Innovators: True Tales of Childhood from Inventors and Trailblazers</a></h3>
+            <p class="book-author">David Stabler</p>
+            <p class="book-blurb">True stories of the childhood mischief and curiosity behind history's great inventors — models the persistence and creative risk-taking every invention actually took.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/8783945-L.jpg" alt="Cover of Howl's Moving Castle" loading="lazy">
+            <p class="call-no">JF · 09</p>
+            <span class="stamp-badge">AGE<br>9+</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Howl%27s%20Moving%20Castle%20Diana%20Wynne%20Jones" target="_blank" rel="noopener noreferrer">Howl's Moving Castle</a></h3>
+            <p class="book-author">Diana Wynne Jones</p>
+            <p class="book-blurb">A cursed young hatmaker takes shelter in the walking castle of a vain, elusive wizard — a longer fantasy plot that stretches reading stamina, wrapped around a lesson about not judging by appearances.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/552491-L.jpg" alt="Cover of Space Encyclopedia" loading="lazy">
+            <p class="call-no">JF · 09</p>
+            <span class="stamp-badge">AGE<br>9+</span>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Space%20Encyclopedia%20DK" target="_blank" rel="noopener noreferrer">Space Encyclopedia</a></h3>
+            <p class="book-author">Various</p>
+            <p class="book-blurb">A galaxy-sized reference on rockets, telescopes, and the scientists who looked up — turns an interest in space into research skills: looking things up, cross-referencing, going deeper.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <!-- PARENTS PANEL -->
+    <div class="panel" id="panel-parents" role="tabpanel" aria-labelledby="tab-parents" hidden>
+      <p class="shelf-intro">Reading for the grown-ups — on raising kids, and on raising kids who read.</p>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Understanding Your Child</h2>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#2f6e6e">
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/9277845-L.jpg" alt="Cover of The Book You Wish Your Parents Had Read" loading="lazy">
+            <p class="call-no">649 · PER</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=The%20Book%20You%20Wish%20Your%20Parents%20Had%20Read%20Philippa%20Perry" target="_blank" rel="noopener noreferrer">The Book You Wish Your Parents Had Read</a></h3>
+            <p class="book-author">Philippa Perry</p>
+            <p class="book-blurb">A psychotherapist's case for how a parent's own upbringing shapes the way they raise their child.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/10354312-L.jpg" alt="Cover of Raising Good Humans" loading="lazy">
+            <p class="call-no">649 · CLA</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Raising%20Good%20Humans%20Hunter%20Clarke-Fields" target="_blank" rel="noopener noreferrer">Raising Good Humans</a></h3>
+            <p class="book-author">Hunter Clarke-Fields</p>
+            <p class="book-blurb">Mindfulness tools for swapping reactive parenting for calm, values-led responses.</p>
+          </article>
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/8469673-L.jpg" alt="Cover of The Whole-Brain Child" loading="lazy">
+            <p class="call-no">649 · SIE</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=The%20Whole-Brain%20Child%20Daniel%20J.%20Siegel%20%26%20Tina%20Payne%20Bryson" target="_blank" rel="noopener noreferrer">The Whole-Brain Child</a></h3>
+            <p class="book-author">Daniel J. Siegel &amp; Tina Payne Bryson</p>
+            <p class="book-blurb">Twelve strategies for working with a developing brain, not against it.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="age-section">
+        <div class="section-head">
+          <h2>Raising Readers</h2>
+        </div>
+        <div class="section-rule"></div>
+        <div class="book-grid" style="--spine:#2f6e6e">
+          <article class="book-card has-cover" data-tags="2025">
+            <img class="cover" src="https://covers.openlibrary.org/b/id/406981-L.jpg" alt="Cover of Teach Your Child to Read in 100 Easy Lessons" loading="lazy">
+            <p class="call-no">028 · ENG</p>
+            <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Teach%20Your%20Child%20to%20Read%20in%20100%20Easy%20Lessons%20Siegfried%20Engelmann%2C%20Phyllis%20Haddox%20%26%20Elaine%20Bruner" target="_blank" rel="noopener noreferrer">Teach Your Child to Read in 100 Easy Lessons</a></h3>
+            <p class="book-author">Siegfried Engelmann, Phyllis Haddox &amp; Elaine Bruner</p>
+            <p class="book-blurb">A scripted, twenty-minutes-a-day phonics program for teaching reading at home.</p>
+          </article>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <footer>Little Shelf — pull up a chair.</footer>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = {
+    kids: document.getElementById('panel-kids'),
+    parents: document.getElementById('panel-parents')
+  };
+
+  function activate(name){
+    tabs.forEach(t => {
+      const on = t.dataset.tab === name;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    Object.entries(panels).forEach(([key, panel]) => {
+      panel.hidden = key !== name;
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => activate(tab.dataset.tab));
+    tab.addEventListener('keydown', e => {
+      const order = ['kids', 'parents'];
+      const i = order.indexOf(tab.dataset.tab);
+      if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+        e.preventDefault();
+        const next = order[(i + (e.key === 'ArrowRight' ? 1 : -1) + order.length) % order.length];
+        document.querySelector('.tab[data-tab="' + next + '"]').focus();
+        activate(next);
+      }
+    });
+  });
+
+  // ---------- Tags (folded into the call number, no extra row) + filter ----------
+  const cards = document.querySelectorAll('.book-card');
+
+  cards.forEach(card => {
+    const tags = (card.dataset.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+    const callNo = card.querySelector('.call-no');
+    if(!tags.length || !callNo) return;
+    callNo.textContent += ' · ' + tags.join(', ');
+  });
+
+  const filterChips = document.querySelectorAll('.filter-chip');
+
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const filter = chip.dataset.filter;
+      filterChips.forEach(c => c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'));
+      cards.forEach(card => {
+        const tags = (card.dataset.tags || '').split(',').map(t => t.trim());
+        const show = filter === 'all' || tags.includes(filter);
+        card.classList.toggle('is-hidden', !show);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
