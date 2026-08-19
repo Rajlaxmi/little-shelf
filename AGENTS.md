@@ -4,14 +4,14 @@ Guidance for adding or editing book entries in `index.html`.
 
 ## Cover images
 
-Covers are pulled from Open Library: `https://covers.openlibrary.org/b/{key}/{value}-M.jpg`.
+Covers are vendored locally in `dist/covers/` and referenced with a relative `src` (e.g. `dist/covers/raising-good-humans.jpg`) — do **not** point `<img>` tags at `covers.openlibrary.org` directly. Open Library's redirect/extraction path is too slow for a page load (see below), so every cover a book uses must be downloaded once and committed.
 
-- Look up the book first: `https://openlibrary.org/search.json?q=<title>+<author>&fields=title,cover_i,isbn,edition_key`
-- **Before using a cover, `curl -s -o /dev/null -w "%{http_code}"` the URL.**
-  - `200` — served directly, fast. Use it.
-  - `302` — Open Library doesn't have this cover cached; it redirects to an on-the-fly zip extraction on `archive.org`, which reliably adds ~1s of latency per image. Avoid these.
-- If the `cover_i` id 302s, try other ISBNs for the same book from the search results (`b/isbn/<isbn>-M.jpg`) — different editions of the same title are often cached separately, and one usually resolves with a direct `200`.
-- If every ISBN for a title 302s, there's no fast option on Open Library for that book; leave a note rather than silently shipping a slow cover.
+To add a cover for a new book:
+
+1. Look up the book: `https://openlibrary.org/search.json?q=<title>+<author>&fields=title,cover_i,isbn,edition_key`
+2. Fetch the real image, following redirects, from the `cover_i` id: `curl -sL "https://covers.openlibrary.org/b/id/<cover_i>-M.jpg" -o dist/covers/<slug>.jpg`
+3. **Verify it's a real cover, not a placeholder**: `file dist/covers/<slug>.jpg`. A genuine cover is a JPEG of a few KB+ (e.g. `JPEG ... 180x270`). Open Library returns HTTP `200` for a **blank 1x1 GIF placeholder** just as often as for a real image — a `200` status does not mean you got a cover. Any `-isbn/` URL that resolves in a 1x1 GIF is a dead end; ISBNs that redirect (`302`) through `archive.org`'s zip-extraction path are frequently the *only* ones with the real image, so follow the redirect (`curl -sL`) rather than avoiding it — the slow part was only ever fetching it live on every page load, not fetching it once at save time.
+4. Reference the saved file with a relative path in `index.html`.
 
 ## Book title/detail links
 
