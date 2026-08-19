@@ -374,28 +374,55 @@
 
   .bg-decor svg{
     position: absolute;
-    opacity: 0.07;
+    opacity: 0.14;
   }
 
   .bg-decor .giraffe{
-    top: -30px;
-    right: -50px;
-    width: 260px;
+    top: -20px;
+    right: -40px;
+    width: 340px;
     color: var(--kraft-dark);
     transform: rotate(-4deg);
   }
 
   .bg-decor .lion{
-    bottom: -40px;
-    left: -55px;
-    width: 300px;
+    bottom: -30px;
+    left: -45px;
+    width: 380px;
     color: var(--teal);
   }
 
+  .bg-decor .elephant{
+    top: 60px;
+    left: -60px;
+    width: 300px;
+    color: var(--stamp);
+    opacity: 0.11;
+    transform: rotate(3deg);
+  }
+
+  .bg-decor .birds{
+    top: 40px;
+    right: 60px;
+    width: 160px;
+    color: var(--mustard);
+    opacity: 0.16;
+  }
+
+  .bg-decor .turtle{
+    bottom: 90px;
+    right: -30px;
+    width: 190px;
+    color: var(--kraft-dark);
+    opacity: 0.12;
+    transform: rotate(-6deg);
+  }
+
   @media (max-width: 700px){
-    .bg-decor svg{ opacity: 0.05; }
-    .bg-decor .giraffe{ width: 170px; top: -10px; right: -40px; }
-    .bg-decor .lion{ width: 190px; bottom: -20px; left: -35px; }
+    .bg-decor .giraffe{ width: 190px; top: -10px; right: -30px; opacity: 0.12; }
+    .bg-decor .lion{ width: 210px; bottom: -15px; left: -30px; opacity: 0.12; }
+    .bg-decor .elephant, .bg-decor .turtle{ display: none; }
+    .bg-decor .birds{ width: 100px; top: 20px; right: 20px; opacity: 0.14; }
   }
 </style>
 </head>
@@ -450,6 +477,35 @@
     <rect x="90" y="108" width="7" height="18" rx="3"/>
     <path d="M98,92 q22,-2 24,18" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
     <circle cx="123" cy="110" r="5"/>
+  </svg>
+  <svg class="elephant" viewBox="0 0 150 130" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="52" rx="28" ry="32"/>
+    <ellipse cx="46" cy="80" rx="40" ry="27"/>
+    <rect x="18" y="99" width="9" height="22" rx="4"/>
+    <rect x="36" y="102" width="9" height="22" rx="4"/>
+    <rect x="54" y="102" width="9" height="22" rx="4"/>
+    <rect x="70" y="99" width="9" height="22" rx="4"/>
+    <path d="M124,50 q18,8 12,32 q-2,10 -12,7 q6,-16 -6,-28 Z"/>
+    <path d="M8,74 q-12,2 -9,16" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="112" cy="44" r="3"/>
+  </svg>
+  <svg class="birds" viewBox="0 0 120 60" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4,40 Q14,26 24,38 Q34,26 44,40"/>
+    <path d="M46,14 Q54,3 62,13 Q70,3 78,14"/>
+    <path d="M82,34 Q90,23 98,33 Q106,23 114,34"/>
+  </svg>
+  <svg class="turtle" viewBox="0 0 150 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="75" cy="55" rx="48" ry="32"/>
+    <circle cx="75" cy="55" r="12"/>
+    <circle cx="45" cy="40" r="10"/>
+    <circle cx="105" cy="40" r="10"/>
+    <circle cx="45" cy="70" r="10"/>
+    <circle cx="105" cy="70" r="10"/>
+    <ellipse cx="130" cy="52" rx="16" ry="12"/>
+    <circle cx="140" cy="48" r="3"/>
+    <path d="M18,50 q-14,-4 -16,8 q10,4 18,-2 Z"/>
+    <path d="M18,62 q-14,4 -14,14 q10,0 16,-8 Z"/>
+    <path d="M132,72 q-4,12 6,18 q6,-8 2,-16 Z"/>
   </svg>
 </div>
 
@@ -712,14 +768,14 @@
         <div class="section-rule"></div>
         <div class="book-grid" style="--spine:#2f6e6e">
           <article class="book-card has-cover" data-tags="2025">
-            <img class="cover" src="https://covers.openlibrary.org/b/id/9277845-M.jpg" alt="Cover of The Book You Wish Your Parents Had Read" width="46" height="66" decoding="async" loading="lazy">
+            <img class="cover" src="https://covers.openlibrary.org/b/isbn/9780241251003-M.jpg" alt="Cover of The Book You Wish Your Parents Had Read" width="46" height="66" decoding="async" loading="lazy">
             <p class="call-no">649 · PER</p>
             <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=The%20Book%20You%20Wish%20Your%20Parents%20Had%20Read%20Philippa%20Perry" target="_blank" rel="noopener noreferrer">The Book You Wish Your Parents Had Read</a></h3>
             <p class="book-author">Philippa Perry</p>
             <p class="book-blurb">A psychotherapist's case for how a parent's own upbringing shapes the way they raise their child.</p>
           </article>
           <article class="book-card has-cover" data-tags="2025">
-            <img class="cover" src="https://covers.openlibrary.org/b/id/10354312-M.jpg" alt="Cover of Raising Good Humans" width="46" height="66" decoding="async" loading="lazy">
+            <img class="cover" src="https://covers.openlibrary.org/b/isbn/9781684033904-M.jpg" alt="Cover of Raising Good Humans" width="46" height="66" decoding="async" loading="lazy">
             <p class="call-no">649 · CLA</p>
             <h3 class="book-title"><a href="https://en.wikipedia.org/wiki/Special:Search?go=Go&amp;search=Raising%20Good%20Humans%20Hunter%20Clarke-Fields" target="_blank" rel="noopener noreferrer">Raising Good Humans</a></h3>
             <p class="book-author">Hunter Clarke-Fields</p>
